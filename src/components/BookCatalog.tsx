@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Search, Edit, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Edit, Trash2, ChevronDown, ChevronUp, BookOpen, RotateCcw } from 'lucide-react';
 import { Book } from '../types/Book';
 import {
   AlertDialog,
@@ -18,6 +17,16 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from './ui/collapsible';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog';
+import { Button } from './ui/button';
 
 interface BookCatalogProps {
   onAddBook: () => void;
@@ -29,6 +38,8 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('جميع الكتب');
   const [openHeadlines, setOpenHeadlines] = useState<Record<string, boolean>>({});
+  const [borrowerName, setBorrowerName] = useState('');
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
   useEffect(() => {
     const savedBooks = localStorage.getItem('library_books');
@@ -63,6 +74,47 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
   };
 
   const categories = ['جميع الكتب', ...Array.from(new Set(books.map(book => book.subject)))];
+
+  const borrowBook = (bookId: string, borrowerName: string) => {
+    const updatedBooks = books.map(book => {
+      if (book.id === bookId && book.availableCopies > 0) {
+        const borrowedBy = book.borrowedBy || [];
+        return {
+          ...book,
+          availableCopies: book.availableCopies - 1,
+          borrowedBy: [...borrowedBy, { name: borrowerName, date: new Date().toISOString() }]
+        };
+      }
+      return book;
+    });
+    setBooks(updatedBooks);
+    localStorage.setItem('library_books', JSON.stringify(updatedBooks));
+    setBorrowerName('');
+    setSelectedBookId(null);
+  };
+
+  const returnBook = (bookId: string, borrowerIndex: number) => {
+    const updatedBooks = books.map(book => {
+      if (book.id === bookId && book.borrowedBy && book.borrowedBy.length > 0) {
+        const borrowedBy = [...book.borrowedBy];
+        borrowedBy.splice(borrowerIndex, 1);
+        return {
+          ...book,
+          availableCopies: book.availableCopies + 1,
+          borrowedBy
+        };
+      }
+      return book;
+    });
+    setBooks(updatedBooks);
+    localStorage.setItem('library_books', JSON.stringify(updatedBooks));
+  };
+
+  const handleBorrowSubmit = () => {
+    if (selectedBookId && borrowerName.trim()) {
+      borrowBook(selectedBookId, borrowerName.trim());
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -156,6 +208,32 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
               <div className="flex justify-between"><span className="font-medium">ص</span> <span>{book.pages || "—"}</span></div>
             </div>
 
+            {/* Borrowed Books Section */}
+            {book.borrowedBy && book.borrowedBy.length > 0 && (
+              <div className="mt-4 bg-yellow-50 rounded p-3">
+                <h4 className="font-medium text-sm text-yellow-800 mb-2">المستعارون:</h4>
+                <div className="space-y-2">
+                  {book.borrowedBy.map((borrower, index) => (
+                    <div key={index} className="flex justify-between items-center text-sm">
+                      <span className="text-yellow-700">{borrower.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-yellow-600">
+                          {new Date(borrower.date).toLocaleDateString('ar-EG')}
+                        </span>
+                        <button
+                          onClick={() => returnBook(book.id, index)}
+                          className="p-1 hover:bg-yellow-200 rounded text-yellow-700"
+                          title="إرجاع"
+                        >
+                          <RotateCcw size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Headlines Section */}
             {book.headlines && book.headlines.length > 0 && (
               <div className="mt-4">
@@ -185,10 +263,61 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
             )}
 
             <div className="mt-6">
-              <button onClick={() => onEditBook(book)} className="w-full bg-[#233958] text-white py-2 rounded-md flex items-center justify-center gap-2 font-medium text-lg hover:bg-blue-900 transition">
-                <Edit size={18} />
-                <span>إعادة</span>
-              </button>
+              {book.availableCopies > 0 ? (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button 
+                      onClick={() => setSelectedBookId(book.id)}
+                      className="w-full bg-[#233958] text-white py-2 rounded-md flex items-center justify-center gap-2 font-medium text-lg hover:bg-blue-900 transition"
+                    >
+                      <BookOpen size={18} />
+                      <span>استعارة</span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>استعارة كتاب</DialogTitle>
+                      <DialogDescription>
+                        أدخل اسم المستعير لكتاب "{book.title}"
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <input
+                        type="text"
+                        placeholder="اسم المستعير"
+                        className="form-input w-full"
+                        value={borrowerName}
+                        onChange={(e) => setBorrowerName(e.target.value)}
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setBorrowerName('');
+                          setSelectedBookId(null);
+                        }}
+                      >
+                        إلغاء
+                      </Button>
+                      <Button 
+                        onClick={handleBorrowSubmit}
+                        disabled={!borrowerName.trim()}
+                      >
+                        تأكيد الاستعارة
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              ) : (
+                <button 
+                  disabled
+                  className="w-full bg-gray-400 text-white py-2 rounded-md flex items-center justify-center gap-2 font-medium text-lg cursor-not-allowed"
+                >
+                  <BookOpen size={18} />
+                  <span>غير متاح</span>
+                </button>
+              )}
             </div>
           </div>
         ))}

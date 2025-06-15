@@ -12,4 +12,5 @@ export interface Book {
   pages?: number;
   headlines?: { page: number; text: string }[];
   dateAdded: string;
+  borrowedBy?: { name: string; date: string }[];
 }
