@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Edit, Trash2 } from 'lucide-react';
+import { Search, Edit, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Book } from '../types/Book';
 import {
   AlertDialog,
@@ -13,6 +13,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './ui/alert-dialog';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from './ui/collapsible';
 
 interface BookCatalogProps {
   onAddBook: () => void;
@@ -23,6 +28,7 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('جميع الكتب');
+  const [openHeadlines, setOpenHeadlines] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const savedBooks = localStorage.getItem('library_books');
@@ -35,7 +41,10 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
     const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          book.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.serialNumber.toString().includes(searchTerm);
+                         book.serialNumber.toString().includes(searchTerm) ||
+                         (book.headlines && book.headlines.some(headline => 
+                           headline.text.toLowerCase().includes(searchTerm.toLowerCase())
+                         ));
     const matchesCategory = selectedCategory === 'جميع الكتب' || book.subject === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -44,6 +53,13 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
     const updatedBooks = books.filter(book => book.id !== id);
     setBooks(updatedBooks);
     localStorage.setItem('library_books', JSON.stringify(updatedBooks));
+  };
+
+  const toggleHeadlines = (bookId: string) => {
+    setOpenHeadlines(prev => ({
+      ...prev,
+      [bookId]: !prev[bookId]
+    }));
   };
 
   const categories = ['جميع الكتب', ...Array.from(new Set(books.map(book => book.subject)))];
@@ -62,7 +78,7 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
           <input
             type="text"
-            placeholder="البحث بالعنوان، المؤلف، المحتوى، أو الرقم التسلسلي..."
+            placeholder="البحث بالعنوان، المؤلف، المحتوى، العناوين الفرعية، أو الرقم التسلسلي..."
             className="form-input pl-11 bg-[#f8f6f3] font-normal text-base w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -139,6 +155,35 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
               <div className="flex justify-between"><span className="font-medium">المحتوى:</span> <span>{book.subject || "—"}</span></div>
               <div className="flex justify-between"><span className="font-medium">ص</span> <span>{book.pages || "—"}</span></div>
             </div>
+
+            {/* Headlines Section */}
+            {book.headlines && book.headlines.length > 0 && (
+              <div className="mt-4">
+                <Collapsible 
+                  open={openHeadlines[book.id]} 
+                  onOpenChange={() => toggleHeadlines(book.id)}
+                >
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded">
+                    <span>العناوين الفرعية ({book.headlines.length})</span>
+                    {openHeadlines[book.id] ? 
+                      <ChevronUp size={16} /> : 
+                      <ChevronDown size={16} />
+                    }
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-2">
+                    <div className="bg-gray-50 rounded p-3 space-y-2">
+                      {book.headlines.map((headline, index) => (
+                        <div key={index} className="flex justify-between text-sm">
+                          <span className="text-gray-600">ص {headline.page}</span>
+                          <span className="text-gray-800 text-right flex-1 mr-3">{headline.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            )}
+
             <div className="mt-6">
               <button onClick={() => onEditBook(book)} className="w-full bg-[#233958] text-white py-2 rounded-md flex items-center justify-center gap-2 font-medium text-lg hover:bg-blue-900 transition">
                 <Edit size={18} />
