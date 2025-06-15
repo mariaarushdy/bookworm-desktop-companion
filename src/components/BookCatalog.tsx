@@ -46,13 +46,13 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
       </div>
 
       {/* Search and Filter */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-1">
-        <div className="relative">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pb-1">
+        <div className="relative md:col-span-2">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
           <input
             type="text"
             placeholder="البحث بالعنوان، المؤلف، المحتوى، أو الرقم التسلسلي..."
-            className="form-input pl-11 bg-[#f8f6f3] font-normal text-base"
+            className="form-input pl-11 bg-[#f8f6f3] font-normal text-base w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ backgroundColor: "#f8f6f3", minHeight: 44 }}
