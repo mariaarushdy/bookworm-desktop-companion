@@ -164,17 +164,29 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
             value={formData.subject}
             onChange={handleInputChange}
           />
+          {/* Pages input and Add Headline button in one row */}
           <div className="flex gap-3 items-center">
-            <input
-              type="number"
-              name="pages"
-              className="form-input bg-[#f8f6f3] w-32"
-              placeholder="الصفحة"
-              value={formData.pages}
-              onChange={handleInputChange}
-              min="1"
-            />
-            <span className="text-base ml-2">ص</span>
+            <div className="flex items-center gap-1">
+              <input
+                type="number"
+                name="pages"
+                className="form-input bg-[#f8f6f3] w-20 h-8 text-xs px-2 py-1"
+                placeholder="الصفحة"
+                value={formData.pages}
+                onChange={handleInputChange}
+                min="1"
+                style={{ fontSize: "0.9rem" }}
+              />
+              <span className="text-base ml-2" style={{ fontSize: "0.95rem" }}>ص</span>
+            </div>
+            {/* Add Headline button */}
+            <button
+              type="button"
+              className="bg-[#E6ECF3] text-[#233958] px-4 py-1 rounded-md text-xs font-medium border border-[#d0d6de] hover:bg-[#d5e3f5] transition whitespace-nowrap"
+              // onClick here is left empty for UI demo, you may add logic later
+            >
+              إضافة عنوان فرعي
+            </button>
           </div>
         </div>
         <div className="flex justify-end gap-4 pt-6">
