@@ -26,6 +26,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
 import { Button } from './ui/button';
 
 interface BookCatalogProps {
@@ -37,6 +44,7 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('جميع الكتب');
+  const [selectedStatus, setSelectedStatus] = useState('جميع الكتب');
   const [openHeadlines, setOpenHeadlines] = useState<Record<string, boolean>>({});
   const [borrowerName, setBorrowerName] = useState('');
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
@@ -56,8 +64,17 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
                          (book.headlines && book.headlines.some(headline => 
                            headline.text.toLowerCase().includes(searchTerm.toLowerCase())
                          ));
+    
     const matchesCategory = selectedCategory === 'جميع الكتب' || book.subject === selectedCategory;
-    return matchesSearch && matchesCategory;
+    
+    let matchesStatus = true;
+    if (selectedStatus === 'الكتب المستعارة') {
+      matchesStatus = book.borrowedBy && book.borrowedBy.length > 0;
+    } else if (selectedStatus === 'الكتب المتاحة') {
+      matchesStatus = book.availableCopies > 0;
+    }
+    
+    return matchesSearch && matchesCategory && matchesStatus;
   });
 
   const deleteBook = (id: string) => {
@@ -72,8 +89,6 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
       [bookId]: !prev[bookId]
     }));
   };
-
-  const categories = ['جميع الكتب', ...Array.from(new Set(books.map(book => book.subject)))];
 
   const borrowBook = (bookId: string, borrowerName: string) => {
     const updatedBooks = books.map(book => {
@@ -116,6 +131,9 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
     }
   };
 
+  const categories = ['جميع الكتب', ...Array.from(new Set(books.map(book => book.subject)))];
+  const statusOptions = ['جميع الكتب', 'الكتب المتاحة', 'الكتب المستعارة'];
+
   return (
     <div className="space-y-8">
       {/* Header Actions */}
@@ -138,16 +156,16 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
           />
         </div>
         <div>
-          <select
-            className="form-input bg-[#f8f6f3] w-full"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            style={{ minHeight: 44 }}
-          >
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-full bg-[#f8f6f3]" style={{ minHeight: 44 }}>
+              <SelectValue placeholder="اختر حالة الكتب" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map(status => (
+                <SelectItem key={status} value={status}>{status}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
