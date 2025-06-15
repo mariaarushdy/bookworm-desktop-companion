@@ -165,38 +165,37 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
             value={formData.subject}
             onChange={handleInputChange}
           />
-          {/* Add Headline (+) button above, pages and headline inline */}
-          <div className="flex flex-col gap-2">
+          {/* "+" button above, then page and headline inputs side by side and looking good */}
+          <div className="flex flex-col items-start gap-1">
             <button
               type="button"
-              className="w-8 h-8 flex items-center justify-center bg-[#E6ECF3] text-[#233958] rounded-md border border-[#d0d6de] hover:bg-[#d5e3f5] transition mb-1 self-start"
-              // onClick for plus button is left empty for now
+              className="w-8 h-8 flex items-center justify-center bg-[#E6ECF3] text-[#233958] rounded-md border border-[#d0d6de] hover:bg-[#d5e3f5] transition mb-2"
               aria-label="إضافة عنوان فرعي"
+              // onClick still only for UI/visual purpose
             >
               <Plus size={18} />
             </button>
-            <div className="flex gap-3 items-center">
-              <div className="flex items-center gap-1">
+            <div className="flex flex-row gap-3 items-center w-full">
+              <div className="flex items-center gap-1 w-28">
                 <input
                   type="number"
                   name="pages"
-                  className="form-input bg-[#f8f6f3] w-20 h-8 text-xs px-2 py-1"
+                  className="form-input bg-[#f8f6f3] h-8 text-xs px-2 py-1 w-16 text-center"
                   placeholder="الصفحة"
                   value={formData.pages}
                   onChange={handleInputChange}
                   min="1"
-                  style={{ fontSize: "0.9rem" }}
+                  style={{ fontSize: "0.92rem" }}
                 />
-                <span className="text-base ml-2" style={{ fontSize: "0.95rem" }}>ص</span>
+                <span className="text-sm ml-1" style={{ fontSize: "0.95rem", color: '#4B5563' }}>ص</span>
               </div>
               <input
                 type="text"
                 name="headline"
-                className="form-input bg-[#f8f6f3] w-full h-8 text-xs px-2 py-1"
+                className="form-input bg-[#f8f6f3] h-8 text-xs px-2 py-1 flex-1"
                 placeholder="عنوان فرعي"
-                // No state handler for headline input, as not yet in data structure
                 disabled
-                style={{ fontSize: "0.9rem" }}
+                style={{ fontSize: "0.93rem", backgroundColor: '#f7f8fa' }}
               />
             </div>
           </div>
