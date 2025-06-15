@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Edit, Trash2 } from 'lucide-react';
 import { Book } from '../types/Book';
@@ -58,9 +57,9 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
             style={{ backgroundColor: "#f8f6f3", minHeight: 44 }}
           />
         </div>
-        <div className="flex justify-end">
+        <div>
           <select
-            className="form-input bg-[#f8f6f3] w-full md:w-auto"
+            className="form-input bg-[#f8f6f3] w-full"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             style={{ minHeight: 44 }}
