@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Book } from '../types/Book';
 import { v4 as uuidv4 } from 'uuid';
+import { Plus } from "lucide-react";
 
 interface AddBookFormProps {
   book?: Book;
@@ -164,29 +165,40 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
             value={formData.subject}
             onChange={handleInputChange}
           />
-          {/* Pages input and Add Headline button in one row */}
-          <div className="flex gap-3 items-center">
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                name="pages"
-                className="form-input bg-[#f8f6f3] w-20 h-8 text-xs px-2 py-1"
-                placeholder="الصفحة"
-                value={formData.pages}
-                onChange={handleInputChange}
-                min="1"
-                style={{ fontSize: "0.9rem" }}
-              />
-              <span className="text-base ml-2" style={{ fontSize: "0.95rem" }}>ص</span>
-            </div>
-            {/* Add Headline button */}
+          {/* Add Headline (+) button above, pages and headline inline */}
+          <div className="flex flex-col gap-2">
             <button
               type="button"
-              className="bg-[#E6ECF3] text-[#233958] px-4 py-1 rounded-md text-xs font-medium border border-[#d0d6de] hover:bg-[#d5e3f5] transition whitespace-nowrap"
-              // onClick here is left empty for UI demo, you may add logic later
+              className="w-8 h-8 flex items-center justify-center bg-[#E6ECF3] text-[#233958] rounded-md border border-[#d0d6de] hover:bg-[#d5e3f5] transition mb-1 self-start"
+              // onClick for plus button is left empty for now
+              aria-label="إضافة عنوان فرعي"
             >
-              إضافة عنوان فرعي
+              <Plus size={18} />
             </button>
+            <div className="flex gap-3 items-center">
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  name="pages"
+                  className="form-input bg-[#f8f6f3] w-20 h-8 text-xs px-2 py-1"
+                  placeholder="الصفحة"
+                  value={formData.pages}
+                  onChange={handleInputChange}
+                  min="1"
+                  style={{ fontSize: "0.9rem" }}
+                />
+                <span className="text-base ml-2" style={{ fontSize: "0.95rem" }}>ص</span>
+              </div>
+              <input
+                type="text"
+                name="headline"
+                className="form-input bg-[#f8f6f3] w-full h-8 text-xs px-2 py-1"
+                placeholder="عنوان فرعي"
+                // No state handler for headline input, as not yet in data structure
+                disabled
+                style={{ fontSize: "0.9rem" }}
+              />
+            </div>
           </div>
         </div>
         <div className="flex justify-end gap-4 pt-6">
