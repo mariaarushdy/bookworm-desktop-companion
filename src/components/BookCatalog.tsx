@@ -51,7 +51,7 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
   return (
     <div className="space-y-8">
       {/* Header Actions */}
-      <div className="flex flex-row-reverse justify-between items-end px-1">
+      <div className="flex justify-between items-end px-1">
         <h2 className="text-2xl font-bold">كتالوج المكتبة</h2>
         <div className="text-md text-gray-700 font-normal">{filteredBooks.length} كتاب في المجموعة</div>
       </div>
