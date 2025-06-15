@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Book } from '../types/Book';
 import { v4 as uuidv4 } from 'uuid';
@@ -237,7 +236,7 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
           </div>
         </div>
         
-        <div className="flex justify-end gap-4 pt-6">
+        <div className="flex justify-center gap-4 pt-6">
           <button
             type="button"
             onClick={onCancel}
