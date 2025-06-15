@@ -156,15 +156,6 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
           </div>
         </div>
         <div>
-          <label className="form-label font-bold mb-2 text-base">المحتوى أو الموضوع</label>
-          <input
-            type="text"
-            name="subject"
-            className="form-input bg-[#f8f6f3] mb-4"
-            placeholder="العنوان أو الموضوع"
-            value={formData.subject}
-            onChange={handleInputChange}
-          />
           {/* "+" button above, then page and headline inputs side by side and looking good */}
           <div className="flex flex-col items-start gap-1">
             <button
