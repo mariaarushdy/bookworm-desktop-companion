@@ -3,167 +3,95 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --background: 36 50% 98%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 210 54% 20%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+    --primary: 218 60% 17%;
+    --muted: 218 12% 92%;
+    --accent: 210 40% 92%;
+    --destructive: 2 74% 58%;
+    --radius: 0.75rem;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#faf7f2] text-[#232B39];
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
 }
 
-/* Arabic RTL support */
-[dir="rtl"] {
-  direction: rtl;
-  text-align: right;
-}
-
-[dir="rtl"] input, [dir="rtl"] textarea, [dir="rtl"] select {
-  text-align: right;
-}
-
-/* Library specific styles */
 .library-header {
-  background: #2C5282;
-  color: white;
+  background: #233958 !important;
+  color: #fff;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  min-height: 76px;
+  font-family: inherit;
 }
-
-.library-card {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
 .form-label {
-  display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
   font-weight: 500;
   color: #374151;
+  text-align: right;
+  display: block;
 }
-
-.form-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  background: white;
+.form-input, select {
+  background: #f8f6f3 !important;
+  border: 1px solid #e1e1e1 !important;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #232b39;
+  padding: 0.65rem 1rem !important;
+  margin-bottom: 0.1rem;
 }
-
 .form-input:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  border-color: #233958;
+  box-shadow: 0 0 0 2px #233b5899;
 }
 
-.btn-primary {
-  background: #2C5282;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 500;
+.bg-white {
+  background: #fff !important;
+}
+.shadow-lg {
+  box-shadow: 0 2px 18px rgba(44, 55, 130, 0.08), 0 0.8px 2px rgba(44, 55, 130, 0.06);
+}
+
+.btn-primary, .bg-[#233958] {
+  background: #233958 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
   border: none;
-  cursor: pointer;
-  transition: background-color 0.2s;
+}
+.btn-primary:hover, .bg-[#233958]:hover {
+  background: #122347 !important;
 }
 
-.btn-primary:hover {
-  background: #2A4F7A;
+.rounded-xl {
+  border-radius: 14px !important;
 }
 
-.btn-secondary {
-  background: #6b7280;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s;
+::-webkit-input-placeholder { color: #b1b1b1; }
+::-moz-placeholder { color: #b1b1b1; }
+:-ms-input-placeholder { color: #b1b1b1; }
+::placeholder { color: #b1b1b1; }
+
+.tab-bg {
+  background: #f8f6f3;
+  border-bottom: 1.5px solid #e2e8f0;
+}
+.tab-active {
+  background: #fff;
+  border: 1.5px solid #e1e1e1;
+  border-bottom: none;
+  color: #233958;
+  font-weight: bold;
+  z-index: 1;
+  position: relative;
 }
 
-.btn-secondary:hover {
-  background: #4b5563;
+footer {
+  background: #233958 !important;
+  color: white !important;
 }
+

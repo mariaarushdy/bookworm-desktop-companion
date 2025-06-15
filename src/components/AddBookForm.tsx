@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Book } from '../types/Book';
 import { v4 as uuidv4 } from 'uuid';
@@ -79,58 +78,52 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
   };
 
   return (
-    <div className="library-card p-6 max-w-4xl mx-auto">
-      <h2 className="text-xl font-bold mb-6">
-        {book ? 'تعديل الكتاب' : 'إضافة كتاب جديد'}
-      </h2>
-      
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="bg-white rounded-xl shadow-lg max-w-3xl mx-auto p-10 mt-4" style={{ minWidth: 350 }}>
+      <h2 className="text-2xl font-extrabold mb-8"> {book ? 'تعديل الكتاب' : 'إضافة كتاب جديد'} </h2>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="form-group">
-            <label className="form-label">العنوان *</label>
+            <label className="form-label font-bold mb-2 text-base">العنوان *</label>
             <input
               type="text"
               name="title"
-              className="form-input"
+              className="form-input bg-[#f8f6f3]"
               placeholder="عنوان الكتاب"
               value={formData.title}
               onChange={handleInputChange}
               required
             />
           </div>
-          
           <div className="form-group">
-            <label className="form-label">المؤلف *</label>
+            <label className="form-label font-bold mb-2 text-base">المؤلف *</label>
             <input
               type="text"
               name="author"
-              className="form-input"
+              className="form-input bg-[#f8f6f3]"
               placeholder="اسم المؤلف"
               value={formData.author}
               onChange={handleInputChange}
               required
             />
           </div>
-          
           <div className="form-group">
-            <label className="form-label">الرقم التسلسلي *</label>
+            <label className="form-label font-bold mb-2 text-base">الرقم التسلسلي *</label>
             <input
               type="number"
               name="serialNumber"
-              className="form-input"
+              className="form-input bg-[#f8f6f3]"
               placeholder="الرقم التسلسلي للكتاب"
               value={formData.serialNumber}
               onChange={handleInputChange}
               required
             />
           </div>
-          
           <div className="form-group">
-            <label className="form-label">عدد النسخ *</label>
+            <label className="form-label font-bold mb-2 text-base">عدد النسخ *</label>
             <input
               type="number"
               name="totalCopies"
-              className="form-input"
+              className="form-input bg-[#f8f6f3]"
               placeholder="عدد النسخ"
               value={formData.totalCopies}
               onChange={handleInputChange}
@@ -138,66 +131,63 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
               required
             />
           </div>
-          
           <div className="form-group">
-            <label className="form-label">الرف</label>
+            <label className="form-label font-bold mb-2 text-base">الصف</label>
             <input
               type="text"
               name="shelf"
-              className="form-input"
-              placeholder="رقم الرف"
+              className="form-input bg-[#f8f6f3]"
+              placeholder="رقم الصف"
               value={formData.shelf}
               onChange={handleInputChange}
             />
           </div>
-          
           <div className="form-group">
-            <label className="form-label">العمود</label>
+            <label className="form-label font-bold mb-2 text-base">العمود</label>
             <input
               type="text"
               name="column"
-              className="form-input"
+              className="form-input bg-[#f8f6f3]"
               placeholder="رقم العمود"
               value={formData.column}
               onChange={handleInputChange}
             />
           </div>
         </div>
-        
-        <div className="form-group">
-          <label className="form-label">الموضوع والمحتوى</label>
-          <div className="flex gap-4">
-            <input
-              type="text"
-              name="subject"
-              className="form-input flex-1"
-              placeholder="الموضوع أو الموضوع"
-              value={formData.subject}
-              onChange={handleInputChange}
-            />
+        <div>
+          <label className="form-label font-bold mb-2 text-base">المحتوى أو الموضوع</label>
+          <input
+            type="text"
+            name="subject"
+            className="form-input bg-[#f8f6f3] mb-4"
+            placeholder="العنوان أو الموضوع"
+            value={formData.subject}
+            onChange={handleInputChange}
+          />
+          <div className="flex gap-3 items-center">
             <input
               type="number"
               name="pages"
-              className="form-input w-32"
+              className="form-input bg-[#f8f6f3] w-32"
               placeholder="الصفحة"
               value={formData.pages}
               onChange={handleInputChange}
               min="1"
             />
+            <span className="text-base ml-2">ص</span>
           </div>
         </div>
-        
-        <div className="flex justify-end gap-4 pt-4">
+        <div className="flex justify-end gap-4 pt-6">
           <button
             type="button"
             onClick={onCancel}
-            className="btn-secondary"
+            className="bg-[#6b7280] text-white px-8 py-2 rounded-md text-lg font-medium hover:bg-[#4b5563] transition"
           >
             إلغاء
           </button>
           <button
             type="submit"
-            className="btn-primary"
+            className="bg-[#233958] text-white px-12 py-2 rounded-md text-lg font-bold hover:bg-blue-900 transition"
           >
             {book ? 'حفظ التغييرات' : 'إضافة الكتاب'}
           </button>
