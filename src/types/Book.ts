@@ -10,6 +10,6 @@ export interface Book {
   shelf?: string;
   column?: string;
   pages?: number;
-  headline?: string;
+  headlines?: { page: number; text: string }[];
   dateAdded: string;
 }

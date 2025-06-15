@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Book } from '../types/Book';
 import { v4 as uuidv4 } from 'uuid';
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
 interface AddBookFormProps {
   book?: Book;
@@ -18,10 +17,12 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
     subject: '',
     totalCopies: 1,
     shelf: '',
-    column: '',
-    pages: 1,
-    headline: ''
+    column: ''
   });
+
+  const [headlines, setHeadlines] = useState<{ page: number; text: string; id: string }[]>([
+    { page: 1, text: '', id: uuidv4() }
+  ]);
 
   useEffect(() => {
     if (book) {
@@ -32,10 +33,12 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
         subject: book.subject,
         totalCopies: book.totalCopies,
         shelf: book.shelf || '',
-        column: book.column || '',
-        pages: book.pages || 1,
-        headline: book.headline || ''
+        column: book.column || ''
       });
+      
+      if (book.headlines && book.headlines.length > 0) {
+        setHeadlines(book.headlines.map(h => ({ ...h, id: uuidv4() })));
+      }
     }
   }, [book]);
 
@@ -48,14 +51,30 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
   };
 
   const handleAddHeadline = () => {
-    console.log('إضافة عنوان فرعي');
-    // You can add functionality here for adding headlines
+    setHeadlines(prev => [...prev, { page: 1, text: '', id: uuidv4() }]);
+  };
+
+  const handleRemoveHeadline = (id: string) => {
+    if (headlines.length > 1) {
+      setHeadlines(prev => prev.filter(h => h.id !== id));
+    }
+  };
+
+  const handleHeadlineChange = (id: string, field: 'page' | 'text', value: string | number) => {
+    setHeadlines(prev => prev.map(h => 
+      h.id === id ? { ...h, [field]: value } : h
+    ));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     const books = JSON.parse(localStorage.getItem('library_books') || '[]');
+    
+    // Filter out empty headlines
+    const validHeadlines = headlines
+      .filter(h => h.text.trim() !== '')
+      .map(({ id, ...h }) => h);
     
     if (book) {
       // Edit existing book
@@ -65,6 +84,7 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
               ...b,
               ...formData,
               serialNumber: parseInt(formData.serialNumber),
+              headlines: validHeadlines,
               availableCopies: formData.totalCopies // Reset available copies when editing
             }
           : b
@@ -76,6 +96,7 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
         id: uuidv4(),
         ...formData,
         serialNumber: parseInt(formData.serialNumber),
+        headlines: validHeadlines,
         availableCopies: formData.totalCopies,
         dateAdded: new Date().toISOString()
       };
@@ -175,8 +196,8 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
             />
           </div>
         </div>
+        
         <div>
-          {/* "+" button above, then page and headline inputs side by side and looking good */}
           <div className="flex flex-col items-start gap-1">
             <button
               type="button"
@@ -186,32 +207,46 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
             >
               <Plus size={18} />
             </button>
-            <div className="flex flex-row gap-3 items-center w-full">
-              <div className="flex items-center gap-1 w-28">
-                <input
-                  type="number"
-                  name="pages"
-                  className="form-input bg-[#f8f6f3] h-8 text-xs px-2 py-1 w-16 text-center"
-                  placeholder="الصفحة"
-                  value={formData.pages}
-                  onChange={handleInputChange}
-                  min="1"
-                  style={{ fontSize: "0.92rem" }}
-                />
-                <span className="text-sm ml-1" style={{ fontSize: "0.95rem", color: '#4B5563' }}>ص</span>
-              </div>
-              <input
-                type="text"
-                name="headline"
-                className="form-input bg-[#f8f6f3] h-8 text-xs px-2 py-1 flex-1"
-                placeholder="عنوان فرعي"
-                value={formData.headline}
-                onChange={handleInputChange}
-                style={{ fontSize: "0.93rem" }}
-              />
+            
+            <div className="w-full space-y-2">
+              {headlines.map((headline) => (
+                <div key={headline.id} className="flex flex-row gap-3 items-center w-full">
+                  <div className="flex items-center gap-1 w-28">
+                    <input
+                      type="number"
+                      className="form-input bg-[#f8f6f3] h-8 text-xs px-2 py-1 w-16 text-center"
+                      placeholder="الصفحة"
+                      value={headline.page}
+                      onChange={(e) => handleHeadlineChange(headline.id, 'page', parseInt(e.target.value) || 1)}
+                      min="1"
+                      style={{ fontSize: "0.92rem" }}
+                    />
+                    <span className="text-sm ml-1" style={{ fontSize: "0.95rem", color: '#4B5563' }}>ص</span>
+                  </div>
+                  <input
+                    type="text"
+                    className="form-input bg-[#f8f6f3] h-8 text-xs px-2 py-1 flex-1"
+                    placeholder="عنوان فرعي"
+                    value={headline.text}
+                    onChange={(e) => handleHeadlineChange(headline.id, 'text', e.target.value)}
+                    style={{ fontSize: "0.93rem" }}
+                  />
+                  {headlines.length > 1 && (
+                    <button
+                      type="button"
+                      className="w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-md border border-red-200 hover:bg-red-200 transition cursor-pointer"
+                      aria-label="حذف العنوان الفرعي"
+                      onClick={() => handleRemoveHeadline(headline.id)}
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
+        
         <div className="flex justify-end gap-4 pt-6">
           <button
             type="button"
