@@ -1,6 +1,18 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, Edit, Trash2 } from 'lucide-react';
 import { Book } from '../types/Book';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from './ui/alert-dialog';
 
 interface BookCatalogProps {
   onAddBook: () => void;
@@ -92,13 +104,30 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
                 >
                   <Edit size={17} className="text-gray-700" />
                 </button>
-                <button
-                  onClick={() => deleteBook(book.id)}
-                  className="p-2 hover:bg-gray-100 rounded"
-                  title="حذف"
-                >
-                  <Trash2 size={17} className="text-red-600" />
-                </button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded"
+                      title="حذف"
+                    >
+                      <Trash2 size={17} className="text-red-600" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        سيتم حذف الكتاب "{book.title}" نهائياً ولا يمكن التراجع عن هذا الإجراء.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => deleteBook(book.id)}>
+                        حذف
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
             
