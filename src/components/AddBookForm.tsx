@@ -15,6 +15,7 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
     title: '',
     author: '',
     serialNumber: '',
+    subject: '',
     totalCopies: 1,
     shelf: '',
     column: '',
@@ -28,6 +29,7 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
         title: book.title,
         author: book.author,
         serialNumber: book.serialNumber.toString(),
+        subject: book.subject,
         totalCopies: book.totalCopies,
         shelf: book.shelf || '',
         column: book.column || '',
@@ -121,6 +123,18 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
               className="form-input bg-[#f8f6f3]"
               placeholder="الرقم التسلسلي للكتاب"
               value={formData.serialNumber}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label font-bold mb-2 text-base">المحتوى *</label>
+            <input
+              type="text"
+              name="subject"
+              className="form-input bg-[#f8f6f3]"
+              placeholder="موضوع الكتاب"
+              value={formData.subject}
               onChange={handleInputChange}
               required
             />
