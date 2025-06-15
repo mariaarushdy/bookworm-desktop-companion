@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Book } from '../types/Book';
 import { v4 as uuidv4 } from 'uuid';
@@ -17,8 +18,8 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
     totalCopies: 1,
     shelf: '',
     column: '',
-    subject: '',
-    pages: 1
+    pages: 1,
+    headline: ''
   });
 
   useEffect(() => {
@@ -30,8 +31,8 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
         totalCopies: book.totalCopies,
         shelf: book.shelf || '',
         column: book.column || '',
-        subject: book.subject,
-        pages: book.pages || 1
+        pages: book.pages || 1,
+        headline: book.headline || ''
       });
     }
   }, [book]);
@@ -42,6 +43,11 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleAddHeadline = () => {
+    console.log('إضافة عنوان فرعي');
+    // You can add functionality here for adding headlines
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -160,9 +166,9 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
           <div className="flex flex-col items-start gap-1">
             <button
               type="button"
-              className="w-8 h-8 flex items-center justify-center bg-[#E6ECF3] text-[#233958] rounded-md border border-[#d0d6de] hover:bg-[#d5e3f5] transition mb-2"
+              className="w-8 h-8 flex items-center justify-center bg-[#E6ECF3] text-[#233958] rounded-md border border-[#d0d6de] hover:bg-[#d5e3f5] transition mb-2 cursor-pointer"
               aria-label="إضافة عنوان فرعي"
-              // onClick still only for UI/visual purpose
+              onClick={handleAddHeadline}
             >
               <Plus size={18} />
             </button>
@@ -185,8 +191,9 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
                 name="headline"
                 className="form-input bg-[#f8f6f3] h-8 text-xs px-2 py-1 flex-1"
                 placeholder="عنوان فرعي"
-                disabled
-                style={{ fontSize: "0.93rem", backgroundColor: '#f7f8fa' }}
+                value={formData.headline}
+                onChange={handleInputChange}
+                style={{ fontSize: "0.93rem" }}
               />
             </div>
           </div>
