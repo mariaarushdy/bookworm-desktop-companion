@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Book } from '../types/Book';
 import { v4 as uuidv4 } from 'uuid';
@@ -181,17 +182,6 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
               className="form-input bg-[#f8f6f3]"
               placeholder="رقم الصف"
               value={formData.shelf}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label font-bold mb-2 text-base">العمود</label>
-            <input
-              type="text"
-              name="column"
-              className="form-input bg-[#f8f6f3]"
-              placeholder="رقم العمود"
-              value={formData.column}
               onChange={handleInputChange}
             />
           </div>
