@@ -3,15 +3,17 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import BookCatalog from '../components/BookCatalog';
 import AddBookForm from '../components/AddBookForm';
+import BookLogs from '../components/BookLogs';
 import { Book } from '../types/Book';
 
 const TABS = [
   { id: "catalog", label: "تصفح الكتب" },
-  { id: "add", label: "إضافة كتاب جديد" }
+  { id: "add", label: "إضافة كتاب جديد" },
+  { id: "logs", label: "سجل العمليات" }
 ];
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'catalog' | 'add' | 'edit'>('catalog');
+  const [currentView, setCurrentView] = useState<'catalog' | 'add' | 'edit' | 'logs'>('catalog');
   const [editingBook, setEditingBook] = useState<Book | undefined>();
 
   const handleTabChange = (id: string) => {
@@ -74,6 +76,9 @@ const Index = () => {
             onSave={handleSave}
             onCancel={handleCancel}
           />
+        )}
+        {currentView === 'logs' && (
+          <BookLogs />
         )}
       </main>
       <footer className="bg-[#233958] border-t mt-12">

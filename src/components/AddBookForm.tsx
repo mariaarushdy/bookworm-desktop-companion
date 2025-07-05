@@ -67,6 +67,16 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
     ));
   };
 
+  const updateLogsBookTitle = (bookId: string, newTitle: string) => {
+    const logs = JSON.parse(localStorage.getItem('library_logs') || '[]');
+    const updatedLogs = logs.map((log: any) => 
+      log.bookId === bookId 
+        ? { ...log, bookTitle: newTitle }
+        : log
+    );
+    localStorage.setItem('library_logs', JSON.stringify(updatedLogs));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -91,6 +101,11 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
           : b
       );
       localStorage.setItem('library_books', JSON.stringify(updatedBooks));
+      
+      // Update logs if book title changed
+      if (book.title !== formData.title) {
+        updateLogsBookTitle(book.id, formData.title);
+      }
     } else {
       // Add new book
       const newBook: Book = {
@@ -138,30 +153,53 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
             />
           </div>
           <div className="form-group">
-            <label className="form-label font-bold mb-2 text-base">الرقم التسلسلي *</label>
+            <label className="form-label font-bold mb-2 text-base">الرقم العام *</label>
             <input
               type="number"
               name="serialNumber"
               className="form-input bg-[#f8f6f3]"
-              placeholder="الرقم التسلسلي للكتاب"
+              placeholder="الرقم العام للكتاب"
               value={formData.serialNumber}
               onChange={handleInputChange}
               required
             />
           </div>
           <div className="form-group">
-            <label className="form-label font-bold mb-2 text-base">المحتوى *</label>
+            <label className="form-label font-bold mb-2 text-base">الرقم الخاص *</label>
             <input
-              type="text"
+              type="number"
               name="subject"
               className="form-input bg-[#f8f6f3]"
-              placeholder="موضوع الكتاب"
+              placeholder="الرقم الخاص"
               value={formData.subject}
               onChange={handleInputChange}
               required
             />
           </div>
           <div className="form-group">
+            <label className="form-label font-bold mb-2 text-base">الافقي *</label>
+            <input
+              type="text"
+              name="shelf"
+              className="form-input bg-[#f8f6f3]"
+              placeholder="الافقي"
+              value={formData.shelf}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label font-bold mb-2 text-base">الراسي *</label>
+            <input
+              type="number"
+              name="column"
+              className="form-input bg-[#f8f6f3]"
+              placeholder="الراسي"
+              value={formData.column}
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
+        <div className="form-group">
             <label className="form-label font-bold mb-2 text-base">عدد النسخ *</label>
             <input
               type="number"
@@ -174,30 +212,6 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ book, onSave, onCancel }) => 
               required
             />
           </div>
-          <div className="form-group">
-            <label className="form-label font-bold mb-2 text-base">الصف</label>
-            <input
-              type="text"
-              name="shelf"
-              className="form-input bg-[#f8f6f3]"
-              placeholder="رقم الصف"
-              value={formData.shelf}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label font-bold mb-2 text-base">العمود</label>
-            <input
-              type="number"
-              name="column"
-              className="form-input bg-[#f8f6f3]"
-              placeholder="رقم العمود"
-              value={formData.column}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-        
         <div>
           <div className="flex flex-col items-start gap-1">
             <button

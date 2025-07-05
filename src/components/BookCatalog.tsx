@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Edit, Trash2, ChevronDown, ChevronUp, BookOpen, RotateCcw } from 'lucide-react';
 import { Book } from '../types/Book';
+import { v4 as uuidv4 } from 'uuid';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,11 +44,12 @@ interface BookCatalogProps {
 const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('جميع الكتب');
+
   const [selectedStatus, setSelectedStatus] = useState('جميع الكتب');
   const [openHeadlines, setOpenHeadlines] = useState<Record<string, boolean>>({});
   const [borrowerName, setBorrowerName] = useState('');
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     const savedBooks = localStorage.getItem('library_books');
@@ -59,13 +61,11 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
   const filteredBooks = books.filter(book => {
     const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         book.subject.toString().includes(searchTerm) ||
                          book.serialNumber.toString().includes(searchTerm) ||
                          (book.headlines && book.headlines.some(headline => 
                            headline.text.toLowerCase().includes(searchTerm.toLowerCase())
                          ));
-    
-    const matchesCategory = selectedCategory === 'جميع الكتب' || book.subject === selectedCategory;
     
     let matchesStatus = true;
     if (selectedStatus === 'الكتب المستعارة') {
@@ -74,7 +74,7 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
       matchesStatus = book.availableCopies > 0;
     }
     
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesStatus;
   });
 
   const deleteBook = (id: string) => {
@@ -94,6 +94,8 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
     const updatedBooks = books.map(book => {
       if (book.id === bookId && book.availableCopies > 0) {
         const borrowedBy = book.borrowedBy || [];
+        // Add log entry
+        addLog(book.id, book.title, borrowerName, 'borrow', book.serialNumber, book.subject);
         return {
           ...book,
           availableCopies: book.availableCopies - 1,
@@ -112,7 +114,10 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
     const updatedBooks = books.map(book => {
       if (book.id === bookId && book.borrowedBy && book.borrowedBy.length > 0) {
         const borrowedBy = [...book.borrowedBy];
+        const returningBorrower = borrowedBy[borrowerIndex];
         borrowedBy.splice(borrowerIndex, 1);
+        // Add log entry
+        addLog(book.id, book.title, returningBorrower.name, 'return', book.serialNumber, book.subject);
         return {
           ...book,
           availableCopies: book.availableCopies + 1,
@@ -128,10 +133,33 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
   const handleBorrowSubmit = () => {
     if (selectedBookId && borrowerName.trim()) {
       borrowBook(selectedBookId, borrowerName.trim());
+      setIsDialogOpen(false); // Close dialog after borrowing
     }
   };
 
-  const categories = ['جميع الكتب', ...Array.from(new Set(books.map(book => book.subject)))];
+  const handleDialogCancel = () => {
+    setBorrowerName('');
+    setSelectedBookId(null);
+    setIsDialogOpen(false);
+  };
+
+  const addLog = (bookId: string, bookTitle: string, borrowerName: string, action: 'borrow' | 'return', serialNumber: number, specialNumber?: string) => {
+    const logs = JSON.parse(localStorage.getItem('library_logs') || '[]');
+    const newLog = {
+      id: uuidv4(),
+      bookId,
+      bookTitle,
+      borrowerName,
+      action,
+      timestamp: new Date().toISOString(),
+      serialNumber,
+      specialNumber
+    };
+    logs.push(newLog);
+    localStorage.setItem('library_logs', JSON.stringify(logs));
+  };
+
+
   const statusOptions = ['جميع الكتب', 'الكتب المتاحة', 'الكتب المستعارة'];
 
   return (
@@ -148,7 +176,7 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
           <input
             type="text"
-            placeholder="البحث بالعنوان، المؤلف، المحتوى، العناوين الفرعية، أو الرقم التسلسلي..."
+            placeholder="البحث بالعنوان، المؤلف، الرقم الخاص، العناوين الفرعية، أو الرقم العام..."
             className="form-input pl-11 bg-[#f8f6f3] font-normal text-base w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -170,12 +198,11 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
       </div>
 
       {/* Books grid/cards */}
-      <div className="flex flex-col gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredBooks.map(book => (
           <div
             key={book.id}
-            className="bg-white rounded-xl shadow-lg p-6 transition-all"
-            style={{ minWidth: 340, maxWidth: 400, marginRight: "auto", marginLeft: "auto" }}
+            className="bg-white rounded-xl shadow-lg p-6 transition-all hover:shadow-xl"
           >
             <div className="flex justify-between items-start mb-3">
               <div>
@@ -208,7 +235,7 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => deleteBook(book.id)}>
+                      <AlertDialogAction onClick={() => deleteBook(book.id)} className="text-white">
                         حذف
                       </AlertDialogAction>
                     </AlertDialogFooter>
@@ -218,12 +245,12 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
             </div>
             
             <div className="space-y-1 text-base text-gray-800">
-              <div className="flex justify-between"><span className="font-medium">الرقم التسلسلي:</span> <span>{book.serialNumber}</span></div>
-              <div className="flex justify-between"><span className="font-medium">الموقع:</span> <span>{book.shelf ? `الصف ${book.shelf}${book.column ? `، العمود ${book.column}` : ""}` : "—"}</span></div>
+              <div className="flex justify-between"><span className="font-medium">الرقم العام:</span> <span>{book.serialNumber}</span></div>
+              <div className="flex justify-between"><span className="font-medium">الموقع:</span> <span>{book.shelf ? `الافقي ${book.shelf}${book.column ? `، الراسي ${book.column}` : ""}` : "—"}</span></div>
               <div className="flex justify-between"><span className="font-medium">إجمالي النسخ:</span> <span>{book.totalCopies}</span></div>
               <div className="flex justify-between"><span className="font-medium">متاح:</span> <span>{book.availableCopies}</span></div>
-              <div className="flex justify-between"><span className="font-medium">المحتوى:</span> <span>{book.subject || "—"}</span></div>
-              <div className="flex justify-between"><span className="font-medium">ص</span> <span>{book.pages || "—"}</span></div>
+              <div className="flex justify-between"><span className="font-medium">الرقم الخاص:</span> <span>{book.subject || "—"}</span></div>
+              {/* <div className="flex justify-between"><span className="font-medium">ص</span> <span>{book.pages || "—"}</span></div> */}
             </div>
 
             {/* Borrowed Books Section */}
@@ -282,10 +309,13 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
 
             <div className="mt-6">
               {book.availableCopies > 0 ? (
-                <Dialog>
+                <Dialog open={isDialogOpen && selectedBookId === book.id} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <button 
-                      onClick={() => setSelectedBookId(book.id)}
+                      onClick={() => {
+                        setSelectedBookId(book.id);
+                        setIsDialogOpen(true);
+                      }}
                       className="w-full bg-[#233958] text-white py-2 rounded-md flex items-center justify-center gap-2 font-medium text-lg hover:bg-blue-900 transition"
                     >
                       <BookOpen size={18} />
@@ -311,16 +341,14 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
                     <DialogFooter>
                       <Button 
                         variant="outline" 
-                        onClick={() => {
-                          setBorrowerName('');
-                          setSelectedBookId(null);
-                        }}
+                        onClick={handleDialogCancel}
                       >
                         إلغاء
                       </Button>
                       <Button 
                         onClick={handleBorrowSubmit}
                         disabled={!borrowerName.trim()}
+                        className="text-white"
                       >
                         تأكيد الاستعارة
                       </Button>
@@ -341,7 +369,7 @@ const BookCatalog: React.FC<BookCatalogProps> = ({ onAddBook, onEditBook }) => {
         ))}
         {filteredBooks.length === 0 && (
           <div className="text-center py-16 text-gray-500 text-lg font-normal">
-            {(searchTerm || selectedCategory !== 'جميع الكتب') 
+            {searchTerm 
               ? 'لم يتم العثور على كتب تطابق البحث'
               : 'لا توجد كتب في المكتبة بعد'}
           </div>
